@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  .content
+    form(method='POST' action='')
+      .form-group
+        label(for="username") Email:
+        input(type='email' name='username' value=user && user.username )
+      .form-group
+        label(for="firstName") First Name:
+        input(type='text' name='firstName' value=user && user.firstName minlength='1')
+      .form-group
+        label(for='lastName') Last Name:
+        input(type='text' name='lastName' value=user && user.lastName minlength='1')
+      .form-group
+        label(for='password') Password:
+        input(type='password' name='password' minlength='8')
+      .form-group
+        label(for='passwordConfirmation') Confirm Password:
+        input(type='password' name='passwordConfirmation' minlength='8')
+      button(type='submit') Sign Up!
+    if errors
+      ul.errors
+        each error in errors
+          li!= error.msg

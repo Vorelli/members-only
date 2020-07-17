@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .content
+    form(method='POST' action='')
+      .form-group
+        label(for="username") Email:
+        input(type='email' name='username' value= username ? username : '' )
+      .form-group
+        label(for='password') Password:
+        input(type='password' name='password' minlength='8')
+      button(type='submit') Sign In!
+    if errors
+      ul.errors
+        each error in errors
+          li!= error.msg

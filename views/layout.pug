@@ -1,0 +1,33 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .header
+      .topHeader
+        .homeName
+          .title 
+            .members Members
+            .only Only
+        .userArea
+          - console.log(currentUser);
+          if currentUser
+            .memberStatus= currentUser.isAdmin ? 'Admin' : currentUser.isMember ? 'Member' : 'Nobody'
+            .profilePicture
+              img(src="/images/" + currentUser._id, alt="Profile picture of " + currentUser.firstName + ' ' + currentUser.lastName)
+            .userName= currentUser.firstName + ' ' + currentUser.lastName
+            .userSignOut
+              a(href='/messageboard/sign-out')= 'Sign out'
+          else
+            .signInOrUp
+              a(href='/messageboard/sign-in') Sign in
+              | #{' or '}
+              a(href='/messageboard/sign-up') Sign up
+      .bottomHeader
+        .headerLinks
+          .headerLeft
+            a(href='/messageboard/') Home
+          .headerRight
+            a(href='/messageboard/post') Post
+    block content
