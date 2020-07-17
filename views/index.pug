@@ -4,4 +4,13 @@ block content
   .content
     .title
       h1= title
-    p Welcome to #{title}
+    each message in messages
+      .message
+        .user
+          span= !message.user ? 'Anonymous' : message.user
+        .title
+          span= message.title
+        .datePosted
+          span= message.datePosted
+        .body
+          p= message.body

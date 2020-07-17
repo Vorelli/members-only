@@ -4,10 +4,23 @@ const Message = mongoose.model('Message');
 const { body, validationResult, sanitize } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const async = require('async');
 
 exports.index = function (req, res, next) {
-  console.log(res.locals.currentUser);
-  res.render('index', { title: 'Message Board' });
+  const getMessages= {
+    messages: function(cb) { Message.find().populate('user').exec(cb); }
+  }
+  const afterGet = function(err,results) {
+    if(err) next(err);
+    else {
+      if(!res.locals.currentUser) 
+        results.messages.forEach(message => { message.user = undefined })
+      else
+        results.messages.forEach(message => { message.user = (message.user.firstName + ' ' + message.user.lastName) })
+      res.render('index', { title: 'Message Board', messages: results.messages })
+    }
+  }
+  async.parallel(getMessages, afterGet);
 };
 
 exports.signUpGet = function (req, res, next) {
@@ -56,14 +69,15 @@ exports.signUpPost = [
       user.save({}, (err, theUser) => {
         if (err) next(err);
         else {
-          passport.authenticate('local', {
-            successRedirect: '/',
-            failureRedirect: '/'
-          });
+          next()
         }
       });
     }
-  }
+  },
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/'
+  })
 ];
 
 exports.signInGet = function (req, res, next) {

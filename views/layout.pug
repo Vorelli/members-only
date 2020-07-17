@@ -11,7 +11,6 @@ html
             .members Members
             .only Only
         .userArea
-          - console.log(currentUser);
           if currentUser
             .memberStatus= currentUser.isAdmin ? 'Admin' : currentUser.isMember ? 'Member' : 'Nobody'
             .profilePicture
