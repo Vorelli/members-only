@@ -83,6 +83,29 @@ body {
         line-height: 150px;
         text-align: center; }
 
+.content .title {
+  font-size: 200%;
+  text-align: center; }
+
+.content .message .user {
+  display: inline-block;
+  width: 33%; }
+
+.content .message .messageTitle {
+  display: inline-block;
+  width: 33%;
+  text-align: center; }
+
+.content .message .datePosted {
+  display: inline-block;
+  width: 33%;
+  text-align: right; }
+
+.content .message .body {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  float: left; }
+
 .content form .form-group {
   height: 50px;
   padding-top: 10px;

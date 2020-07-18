@@ -13,4 +13,7 @@ router.post('/sign-in', messageBoardController.signInPost);
 
 router.get('/sign-out', messageBoardController.signOutGet);
 
+router.get('/post', messageBoardController.postGet);
+router.post('/post', messageBoardController.postPost);
+
 module.exports = router;
