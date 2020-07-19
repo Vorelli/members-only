@@ -7,12 +7,11 @@ block content
     each message in messages
       .message
         .user
-          -console.log(message);
           -const userName = !!message.user ? (message.user.firstName + ' ' + message.user.lastName) : undefined;
           span= !userName ? 'Anonymous' : userName
         .messageTitle
           span= message.title
         .datePosted
           span= message.dateFormatted
-        .body
-          p= message.body
+      .body
+        p= message.body

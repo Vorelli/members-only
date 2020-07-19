@@ -85,32 +85,39 @@ body {
 
 .content .title {
   font-size: 200%;
-  text-align: center; }
+  text-align: center;
+  padding-bottom: 20px; }
 
-.content .message .user {
-  display: inline-block;
-  width: 33%; }
+.content .message {
+  display: flex;
+  float: left;
+  width: 100%; }
+  .content .message .user {
+    display: inline-block;
+    flex: 0;
+    white-space: nowrap; }
+  .content .message .messageTitle {
+    display: inline-block;
+    flex: 1;
+    text-align: center; }
+  .content .message .datePosted {
+    display: inline-block;
+    flex: 0;
+    text-align: right; }
 
-.content .message .messageTitle {
-  display: inline-block;
-  width: 33%;
-  text-align: center; }
-
-.content .message .datePosted {
-  display: inline-block;
-  width: 33%;
-  text-align: right; }
-
-.content .message .body {
+.content .body {
   margin-top: 10px;
   margin-bottom: 20px;
-  float: left; }
+  float: left;
+  width: 100%; }
 
 .content form .form-group {
-  height: 50px;
-  padding-top: 10px;
+  min-height: 50px;
+  width: 100%;
+  padding-top: 20px;
   vertical-align: middle;
-  text-align: left; }
+  text-align: left;
+  float: left; }
   .content form .form-group label {
     width: 20%;
     float: left;
@@ -125,6 +132,16 @@ body {
     height: 30px;
     font-size: 125%;
     margin: auto; }
+  .content form .form-group button {
+    text-align: center; }
+  .content form .form-group textarea {
+    float: right;
+    width: 70%;
+    max-width: 70%;
+    height: 60px; }
+
+.content form .buttonGroup {
+  text-align: center; }
 
 a {
   color: #8b5b00;

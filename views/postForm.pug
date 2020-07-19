@@ -5,9 +5,17 @@ block content
     .title
       h1= title
     form(method='POST' action='')
-      form-group
+      .form-group
         label(for='title') Title:
-        input(type='text' name='title' placeholder='Title')
-      form-group
+        input(type='text' name='title' placeholder='Title' value = message ? message.title : '')
+      .form-group
         label(for='messageBody') Message Body:
-        textarea(name='messageBody' rows='4' cols="50")
+        textarea(name='messageBody' rows='4' cols="50" value = message ? message.body : '')
+      .form-group.buttonGroup
+        button(type='submit') Post
+  if errors
+    .errors
+      ul.errors
+        each error in errors
+          li!= error.msg
+  script(src="/javascripts/setTextarea.js" messageBody= message ? message.body : '')

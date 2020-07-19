@@ -89,28 +89,36 @@ body
   .title
     font-size: 200%
     text-align: center
+    padding-bottom: 20px
   .message
+    display: flex
+    float: left
+    width: 100%
     .user
       display: inline-block
-      width: 33%
+      flex: 0
+      white-space: nowrap
     .messageTitle
       display: inline-block
-      width: 33%
+      flex: 1
       text-align: center
     .datePosted
       display: inline-block
-      width: 33%
+      flex: 0
       text-align: right
-    .body
-      margin-top: 10px
-      margin-bottom: 20px
-      float: left
+  .body
+    margin-top: 10px
+    margin-bottom: 20px
+    float: left
+    width: 100%
   form
     .form-group
-      height: 50px
-      padding-top: 10px
+      min-height: 50px
+      width: 100%
+      padding-top: 20px
       vertical-align: middle
       text-align: left
+      float: left
       label
         width: 20%
         float: left
@@ -125,6 +133,15 @@ body
         height: 30px
         font-size: 125%
         margin: auto
+      button
+        text-align: center
+      textarea
+        float: right
+        width: 70%
+        max-width: 70%
+        height: 60px
+    .buttonGroup
+      text-align: center
 
 a
   color: #8b5b00
