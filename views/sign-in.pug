@@ -2,6 +2,9 @@ extends layout
 
 block content
   .content
+    .title
+      h1= title
+    hr
     form(method='POST' action='')
       .form-group
         label(for="username") Email:
@@ -10,6 +13,7 @@ block content
         label(for='password') Password:
         input(type='password' name='password' minlength='8')
       button(type='submit') Sign In!
+    hr
     if errors
       ul.errors
         each error in errors

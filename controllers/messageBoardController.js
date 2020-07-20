@@ -98,7 +98,12 @@ exports.signUpPost = [
 ];
 
 exports.signInGet = function (req, res, next) {
-  res.render('sign-in', { title: 'Sign In' });
+  const errors = [];
+  if (req.session.message) {
+    errors.push({ msg: req.session.message });
+    req.session.message = undefined;
+  }
+  res.render('sign-in', { title: 'Sign In', errors: errors });
 };
 
 exports.signInPost = [
@@ -107,7 +112,7 @@ exports.signInPost = [
   body('username')
     .trim()
     .isEmail()
-    .withMessage('Username needs to be an email.'),
+    .withMessage('You must enter a valid email containing an @ symbol and a .'),
   body('password', 'Password must be supplied and at least 8 characters.')
     .trim()
     .isLength({ min: 8 }),
@@ -119,7 +124,7 @@ exports.signInPost = [
       res.render('sign-in', {
         title: 'Sign In',
         username: req.body.username,
-        errors: errors.toArray()
+        errors: errors.array()
       });
     }
     next();
@@ -127,7 +132,7 @@ exports.signInPost = [
 
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/'
+    failureRedirect: '/sign-in'
   })
 ];
 
@@ -137,8 +142,10 @@ exports.signOutGet = function (req, res, next) {
 };
 
 exports.postGet = function (req, res, next) {
-  if (!res.locals.currentUser) res.redirect('/');
-  else {
+  if (!res.locals.currentUser) {
+    req.session.message = 'You need to be logged in to post!';
+    res.redirect('/messageboard/sign-in');
+  } else {
     res.render('postForm', { title: 'Create Post' });
   }
 };
