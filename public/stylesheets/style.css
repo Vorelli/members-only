@@ -64,7 +64,7 @@ body {
     body .header .topHeader .homeName {
       color: #b877008c;
       background-color: #e5e5e5;
-      width: 70%;
+      width: 60%;
       height: 100%;
       float: left; }
       body .header .topHeader .homeName .members, body .header .topHeader .homeName .only {
@@ -75,13 +75,35 @@ body {
     body .header .topHeader .userArea {
       color: #b877008c;
       background-color: #e5e5e5;
-      width: 30%;
+      width: 40%;
       height: 100%;
       float: right; }
       body .header .topHeader .userArea .signInOrUp {
         font-size: 125%;
         line-height: 150px;
         text-align: center; }
+      body .header .topHeader .userArea .signedInUser {
+        margin-top: 25px; }
+        body .header .topHeader .userArea .signedInUser .profilePicture {
+          float: left;
+          width: 50%;
+          height: 100%;
+          text-align: center; }
+          body .header .topHeader .userArea .signedInUser .profilePicture img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; }
+        body .header .topHeader .userArea .signedInUser .userRightBlock {
+          width: 50%;
+          float: right; }
+          body .header .topHeader .userArea .signedInUser .userRightBlock .memberStatus {
+            margin-top: 20px !important; }
+          body .header .topHeader .userArea .signedInUser .userRightBlock .memberStatus, body .header .topHeader .userArea .signedInUser .userRightBlock .userName, body .header .topHeader .userArea .signedInUser .userRightBlock .userSignOut {
+            margin: 5px 0px; }
+          body .header .topHeader .userArea .signedInUser .userRightBlock .userName {
+            display: inline;
+            padding: 0px 2.5px;
+            border: 1px grey solid; }
 
 .content .title {
   font-size: 200%;
@@ -89,27 +111,27 @@ body {
   padding: 20px 0px; }
 
 .content .message {
-  display: flex;
   float: left;
-  width: 100%; }
-  .content .message .user {
-    display: inline-block;
-    flex: 0;
-    white-space: nowrap; }
+  width: 100%;
+  border: 1px grey solid;
+  margin-bottom: 10px; }
   .content .message .messageTitle {
     display: inline-block;
-    flex: 1;
+    width: 100%;
     text-align: center; }
+  .content .message .user {
+    display: inline-block;
+    white-space: nowrap;
+    width: 50%; }
   .content .message .datePosted {
     display: inline-block;
-    flex: 0;
+    width: 50%;
     text-align: right; }
-
-.content .body {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  float: left;
-  width: 100%; }
+  .content .message .body {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    float: left;
+    width: 100%; }
 
 .content form .form-group {
   min-height: 50px;

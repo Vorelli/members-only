@@ -6,12 +6,12 @@ block content
       h1= title
     each message in messages
       .message
+        .messageTitle
+          span= message.title
         .user
           -const userName = !!message.user ? (message.user.firstName + ' ' + message.user.lastName) : undefined;
           span= !userName ? 'Anonymous' : userName
-        .messageTitle
-          span= message.title
         .datePosted
           span= message.dateFormatted
-      .body
-        p= message.body
+        .body
+          p= message.body
