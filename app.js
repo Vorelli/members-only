@@ -20,7 +20,7 @@ const messageBoardRouter = require('./routes/messageBoard');
 
 var app = express();
 
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 
 const secret = process.env.SECRET;
 const mongoDB = process.env.MONGODB;
