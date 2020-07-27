@@ -1,6 +1,3 @@
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const Message = mongoose.model('Message');
 const { sanitizeBody } = require('express-validator/filter');
 const { body, validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
@@ -10,35 +7,46 @@ const moment = require('moment');
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
-const user = require('../models/user');
-const { raw } = require('express');
+const { v5 } = require('uuid');
 
 exports.index = function (req, res, next) {
   const getMessages = {
     messages: function (cb) {
-      Message.find()
-        .populate({ path: 'user', select: 'firstName lastName' })
-        .exec(cb);
+      res.locals.pool.query(
+        `
+        SELECT title, body, datePosted, firstName, lastName 
+        FROM messages 
+        INNER JOIN users ON user_id = id
+      `,
+        (err, result) => {
+          result.rows.forEach((row) => {
+            row.dateposted = moment(row.dateposted).format('YYYY-MM-DD');
+          });
+          if (err) cb(err);
+          else cb(null, result);
+        }
+      );
     }
   };
-  const afterGet = function (err, results) {
+  const afterGet = async function (err, results) {
     if (err) next(err);
     else {
       if (!res.locals.currentUser) {
-        results.messages.forEach((message) => {
-          message.user = undefined;
+        results.messages.rows.forEach((row) => {
+          row.firstname = undefined;
+          row.lastname = undefined;
         });
       } else {
-        for (var i = results.messages.length - 1; i >= 0; i--) {
-          results.messages[i].user =
-            results.messages[i].user.firstName +
+        for (var i = results.messages.rows.length - 1; i >= 0; i--) {
+          results.messages.rows[i].user =
+            results.messages.rows[i].firstname +
             ' ' +
-            results.messages[i].user.lastName;
+            results.messages.rows[i].lastname;
         }
       }
       res.render('index', {
         title: 'Message Board',
-        messages: results.messages
+        rows: results.messages.rows
       });
     }
   };
@@ -80,11 +88,17 @@ exports.signUpPost = [
 
     const username = req.body.username;
     username.trim();
-    const emailValidator = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const emailValidator = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (!emailValidator.test(username)) {
       res.locals.errors.push({ msg: 'You must enter a valid email address.' });
     }
-    if (await User.findOne({ username: username })) {
+    if (
+      (await (
+        await res.locals.pool.query('SELECT * FROM users WHERE username = $1', [
+          username
+        ])
+      ).rows.length) > 0
+    ) {
       res.locals.errors.push({
         msg: 'This email has been used before. Try to log in.'
       });
@@ -118,15 +132,30 @@ exports.signUpPost = [
 
   async (req, res, next) => {
     const errors = res.locals.errors;
+    const userId = v5(req.body.username, process.env.SECRETUUID);
 
-    const user = new User({
-      username: req.body.username,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      password: await req.body.hashedPass,
-      isMember: true,
-      isAdmin: false
-    });
+    const createUserQuery = `
+    INSERT INTO users
+    (id, username, firstName, lastName)
+    VALUES($1, $2, $3, $4);`;
+    const createUserQueryValues = [
+      userId,
+      req.body.username,
+      req.body.firstName,
+      req.body.lastName
+    ];
+
+    const createUserPassQuery = `
+    INSERT INTO userpasses
+    (user_id, passwordHash)
+    VALUES($1, $2);`;
+    const createUserPassQueryValues = [userId, await req.body.hashedPass];
+
+    const createUserPrivilegesQuery = `
+    INSERT INTO userPrivileges
+    (user_id, isMember, isAdmin)
+    VALUES($1, $2, $3);`;
+    const createUserPrivilegesQueryValues = [userId, true, false];
 
     if (errors.length !== 0) {
       if (
@@ -142,29 +171,48 @@ exports.signUpPost = [
         res.render('sign-up', {
           title: 'Sign Up',
           errors: errors,
-          user: user
+          user: {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            username: req.body.username
+          }
         });
       }
     } else {
-      user.save({}, (err, theUser) => {
+      res.locals.pool.connect(function (err, client, done) {
         if (err) next(err);
         else {
-          const files = res.locals.files;
-          const oldPath = files.picture.path;
-          const newPath = path.join(
-            path.join(__dirname, '../'),
-            'public/images/' + req.body.username + '.jpg'
-          );
-          const rawData = fs.readFileSync(oldPath);
-          console.log('done reading file');
-          fs.writeFileSync(newPath, rawData);
-          next();
+          Promise.all([
+            client.query(createUserQuery, createUserQueryValues),
+            client.query(createUserPassQuery, createUserPassQueryValues),
+            client.query(
+              createUserPrivilegesQuery,
+              createUserPrivilegesQueryValues
+            )
+          ])
+            .then((values) => {
+              const files = res.locals.files;
+              res.locals.files = undefined;
+              const oldPath = files.picture.path;
+              const newPath = path.join(
+                path.join(__dirname, '../'),
+                'public/images/' + req.body.username + '.jpg'
+              );
+              const rawData = fs.readFileSync(oldPath);
+              fs.writeFileSync(newPath, rawData);
+              next();
+            })
+            .catch((err) => {
+              next(err);
+            })
+            .finally(() => {
+              done();
+            });
         }
       });
     }
   },
   (req, res, next) => {
-    console.log('next!');
     next();
   },
   passport.authenticate('local', {
@@ -241,29 +289,38 @@ exports.postPost = [
 
   (req, res, next) => {
     if (res.locals.currentUser) {
-      const message = new Message({
-        title: req.body.title,
-        body: req.body.messageBody,
-        datePosted: moment(new Date()),
-        user: res.locals.currentUser
-      });
+      const createPostQuery = `
+      INSERT INTO messages
+      (user_id, title, body, datePosted)
+      VALUES($1,$2,$3,$4);`;
+      const createPostQueryValues = [
+        res.locals.currentUser.id,
+        req.body.title,
+        req.body.body,
+        moment(new Date())
+      ];
 
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
         res.render('postForm', {
           title: 'Create Post',
-          message: message,
+          message: { body: req.body.body, title: req.body.title },
           errors: errors.array()
         });
       } else {
-        message.save({}, function (err, theMessage) {
-          if (err) next(err);
-          else res.redirect('/');
-        });
+        res.locals.pool
+          .query(createPostQuery, createPostQueryValues)
+          .then((value) => {
+            res.redirect('/');
+          })
+          .catch((err) => {
+            next(err);
+          });
       }
     } else {
-      res.redirect('/');
+      req.session.message = 'You need to be logged in to post!';
+      res.redirect('/messageboard/sign-in');
     }
   }
 ];

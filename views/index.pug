@@ -4,14 +4,13 @@ block content
   .content
     .title
       h1= title
-    each message in messages
+    each row in rows
       .message
         .messageTitle
-          span= message.title
+          span= row.title
         .user
-          -const userName = !!message.user ? (message.user.firstName + ' ' + message.user.lastName) : undefined;
-          span= !userName ? 'Anonymous' : userName
+          span= !row.user ? 'Anonymous' : row.user
         .datePosted
-          span= message.dateFormatted
+          span= row.dateposted
         .body
-          p= message.body
+          p= row.body

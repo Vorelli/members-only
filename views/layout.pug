@@ -15,10 +15,10 @@ html
           if currentUser
             .signedInUser
               .profilePicture
-                img(src="/images/" + currentUser.username + '.jpg', alt="Profile picture of " + currentUser.firstName + ' ' + currentUser.lastName)
+                img(src="/images/" + currentUser.username + '.jpg', alt="Profile picture of " + currentUser.firstname + ' ' + currentUser.lastname)
               .userRightBlock
-                .memberStatus= currentUser.isAdmin ? 'Admin' : currentUser.isMember ? 'Member' : 'Nobody'
-                .userName= currentUser.firstName + ' ' + currentUser.lastName
+                .memberStatus= currentUser.isadmin ? 'Admin' : currentUser.ismember ? 'Member' : 'Nobody'
+                .userName= currentUser.firstname + ' ' + currentUser.lastname
                 .userSignOut
                   a(href='/messageboard/sign-out')= 'Sign out'
           else
